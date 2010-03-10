@@ -5,7 +5,7 @@ A Django app to export a database dump and media files
 This app provides a few views to export the database and the media-root. 
 Default templates are provided for an easy integration with django.contrib.admin.
 
-Currently mysql and sqlite3 database backends are supported.
+Currently mysql, sqlite3 and postgresql database backends are supported.
 
 Additionally the app provides some Amazon S3 integration. Exporting a
 database dump directly to S3 and listing the bucket contents is implemented.
@@ -61,6 +61,14 @@ There are currently two **optional** settings::
                   
   SQLITE3DUMP_CMD: The command used to dump a sqlite2 database.
                    Defaults to: 'echo ".dump" | /usr/bin/sqlite3 %s | bzip2 -c'
+                   
+  POSTGRESQL_CMD: The command used to dump a postgresql database. (uses the ~/.pgpass file to pass the password to pg_dump)
+                  Defaults to: '/bin/touch ~/.pgpass \
+                  && /bin/mv ~/.pgpass ~/.pgpass.bak \
+                  && /bin/echo "%(host)s:%(port)s:%(database)s:%(username)s:%(password)s" > ~/.pgpass \
+                  && /bin/chmod 600 ~/.pgpass \
+                  && /usr/bin/pg_dump -h %(host)s -p %(port)s -U %(username)s %(database)s | bzip2 -c \
+                  && /bin/mv ~/.pgpass.bak ~/.pgpass'
 
   DISABLE_STREAMING: Normally an exported file would get streamed to the client
                      in small chunks. If you are using ConditionalGetMiddleware

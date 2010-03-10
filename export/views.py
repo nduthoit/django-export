@@ -45,7 +45,7 @@ def export_database(request):
                                         'username':settings.DATABASE_USER,
                                         'password': settings.DATABASE_PASSWORD}
         else:
-            raise ImproperlyConfigured, "Sorry, django-export only supports mysql and sqlite3 database backends."
+            raise ImproperlyConfigured, "Sorry, django-export only supports mysql, sqlite3 and postgresql database backends."
         stdin, stdout = os.popen2(cmd)
         stdin.close()
         if DISABLE_STREAMING:

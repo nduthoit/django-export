@@ -16,6 +16,14 @@ except ImportError:
 # default dump commands, you can overwrite these in your settings.
 MYSQLDUMP_CMD = getattr(settings, 'MYSQLDUMP_CMD', '/usr/bin/mysqldump -h %s --opt --compact --skip-add-locks -u %s -p%s %s | bzip2 -c')
 SQLITE3DUMP_CMD = getattr(settings, 'SQLITE3DUMP_CMD', 'echo ".dump" | /usr/bin/sqlite3 %s | bzip2 -c')
+# PostgreSQL command: uses the .pgpass file to store the password:
+#     touch ~/.pgpass # Create .pgpass if it didn't exist
+#     mv ~/.pgpass ~/.pgpass.bak # Make a copy of current .pgpass
+#     echo "%(host)s:%(port)s:%(database)s:%(username)s:%(password)s" > ~/.pgpass # Add entry to .pgpass
+#     chmod 600 ~/.pgpass # Apply proper permissions
+#     pg_dump -h %(host)s -p %(port)s -U %(username)s %(database)s | bzip2 -c # pg_dump
+#     mv ~/.pgpass.bak ~/.pgpass # Restore original .pgpass 
+POSTGRESQLDUMP_CMD = getattr(settings, 'POSTGRESQLDUMP_CMD', '/bin/touch ~/.pgpass && /bin/mv ~/.pgpass ~/.pgpass.bak && /bin/echo "%(host)s:%(port)s:%(database)s:%(username)s:%(password)s" > ~/.pgpass && /bin/chmod 600 ~/.pgpass && /usr/bin/pg_dump -h %(host)s -p %(port)s -U %(username)s %(database)s | bzip2 -c && /bin/mv ~/.pgpass.bak ~/.pgpass')
 DISABLE_STREAMING = getattr(settings, 'DISABLE_STREAMING', False)
 
 
@@ -30,6 +38,12 @@ def export_database(request):
             cmd = MYSQLDUMP_CMD % (settings.DATABASE_HOST, settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
         elif settings.DATABASE_ENGINE == 'sqlite3':
             cmd = SQLITE3DUMP_CMD % settings.DATABASE_NAME
+        elif 'postgresql' in settings.DATABASE_ENGINE:
+            cmd = POSTGRESQLDUMP_CMD % {'host':settings.DATABASE_HOST or 'localhost', 
+                                        'port':settings.DATABASE_PORT or '5432', 
+                                        'database': settings.DATABASE_NAME,
+                                        'username':settings.DATABASE_USER,
+                                        'password': settings.DATABASE_PASSWORD}
         else:
             raise ImproperlyConfigured, "Sorry, django-export only supports mysql and sqlite3 database backends."
         stdin, stdout = os.popen2(cmd)

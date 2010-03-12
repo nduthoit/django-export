@@ -64,9 +64,9 @@ There are currently two **optional** settings::
                    
   POSTGRESQL_CMD: The command used to dump a postgresql database. (uses the ~/.pgpass file to pass the password to pg_dump)
                   Defaults to: '/bin/touch ~/.pgpass \
-                  && /bin/mv ~/.pgpass ~/.pgpass.bak \
-                  && /bin/echo "%(host)s:%(port)s:%(database)s:%(username)s:%(password)s" > ~/.pgpass \
                   && /bin/chmod 600 ~/.pgpass \
+                  && /bin/cp ~/.pgpass ~/.pgpass.bak \
+                  && /bin/echo "%(host)s:%(port)s:%(database)s:%(username)s:%(password)s" > ~/.pgpass \
                   && /usr/bin/pg_dump -h %(host)s -p %(port)s -U %(username)s %(database)s | bzip2 -c \
                   && /bin/mv ~/.pgpass.bak ~/.pgpass'
 

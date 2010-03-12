@@ -18,12 +18,12 @@ MYSQLDUMP_CMD = getattr(settings, 'MYSQLDUMP_CMD', '/usr/bin/mysqldump -h %s --o
 SQLITE3DUMP_CMD = getattr(settings, 'SQLITE3DUMP_CMD', 'echo ".dump" | /usr/bin/sqlite3 %s | bzip2 -c')
 # PostgreSQL command: uses the .pgpass file to store the password:
 #     touch ~/.pgpass # Create .pgpass if it didn't exist
-#     mv ~/.pgpass ~/.pgpass.bak # Make a copy of current .pgpass
-#     echo "%(host)s:%(port)s:%(database)s:%(username)s:%(password)s" > ~/.pgpass # Add entry to .pgpass
 #     chmod 600 ~/.pgpass # Apply proper permissions
+#     cp ~/.pgpass ~/.pgpass.bak # Make a copy of current .pgpass
+#     echo "%(host)s:%(port)s:%(database)s:%(username)s:%(password)s" > ~/.pgpass # Add entry to .pgpass
 #     pg_dump -h %(host)s -p %(port)s -U %(username)s %(database)s | bzip2 -c # pg_dump
 #     mv ~/.pgpass.bak ~/.pgpass # Restore original .pgpass 
-POSTGRESQLDUMP_CMD = getattr(settings, 'POSTGRESQLDUMP_CMD', '/bin/touch ~/.pgpass && /bin/mv ~/.pgpass ~/.pgpass.bak && /bin/echo "%(host)s:%(port)s:%(database)s:%(username)s:%(password)s" > ~/.pgpass && /bin/chmod 600 ~/.pgpass && /usr/bin/pg_dump -h %(host)s -p %(port)s -U %(username)s %(database)s | bzip2 -c && /bin/mv ~/.pgpass.bak ~/.pgpass')
+POSTGRESQLDUMP_CMD = getattr(settings, 'POSTGRESQLDUMP_CMD', '/bin/touch ~/.pgpass && /bin/chmod 600 ~/.pgpass && /bin/cp ~/.pgpass ~/.pgpass.bak && /bin/echo "%(host)s:%(port)s:%(database)s:%(username)s:%(password)s" > ~/.pgpass && /usr/bin/pg_dump -h %(host)s -p %(port)s -U %(username)s %(database)s | bzip2 -c && /bin/mv ~/.pgpass.bak ~/.pgpass')
 DISABLE_STREAMING = getattr(settings, 'DISABLE_STREAMING', False)
 
 
